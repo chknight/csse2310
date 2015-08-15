@@ -5,9 +5,9 @@
     > Created Time: Wed 05 Aug 2015 09:51:49 AM AEST
  ************************************************************************/
 
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 char **block; /*block is usced to store the +*/
 char **cell;  /*block cell is used to store the */
@@ -24,6 +24,7 @@ int finishedCell; /*used to store how many cells is occupyed*/
 int readNumberFromString(char* string); 
 int changeStringToNumber(const char* string);
 int initialize(char**, int);
+char** initPointer(int width, int height, char type);
 void printMap();
 int getNumber();
 char getType();
@@ -86,7 +87,7 @@ int readNumberFromString(char* string) {
     while(*string != ' ' && *string != '\n') {
         if (*string >= '0' && *string <= '9') {
             result *= 10;
-            result += (*string)-'0';
+            result += (*string) - '0';
             string++;
         } else {
             return -1;
@@ -108,7 +109,7 @@ int changeStringToNumber(const char* string) {
     while (string[index] != '\0') {
         if (string[index] >= '0' && string[index] <= '9') {
             result *= 10;
-            result += string[index]-'0';
+            result += string[index] - '0';
             index++;
         } else {
             return -1;
@@ -148,70 +149,70 @@ int initialize(char** argv, int argc) {
         return 3;
     }
     currentUser = 0;
-    users = (char*)malloc(sizeof(char)*playNumber);
-    winCells = (int*)malloc(sizeof(int)*playNumber);
+    users = (char*)malloc(sizeof(char) * playNumber);
+    winCells = (int*)malloc(sizeof(int) * playNumber);
     for (i = 0; i < playNumber; ++i) {
-        users[i] = 'A'+i;
+        users[i] = 'A' + i;
         winCells[i] = 0;
     }
     finishedCell = 0;
-    hWall = (char**)malloc(sizeof(char*)*(height+1));
-    vWall = (char**)malloc(sizeof(char*)*height);
-    block = (char**)malloc(sizeof(char*)*(height+1));
-    cell = (char**)malloc(sizeof(char*)*height);
-    cellCount = (int**)malloc(sizeof(int*)*height);
+    hWall = initPointer(width, height + 1, ' ');
+    vWall = initPointer(width + 1, height, ' ');
+    block = initPointer(width + 1, height + 1, '+');
+    cell = (char**)malloc(sizeof(char*) * height);
+    cellCount = (int**)malloc(sizeof(int*) * height);
     for (i = 0; i < height; ++i) {
-        vWall[i] = (char*)malloc(sizeof(char)*(width+1));
-        for (j = 0; j < width+1; ++j)
-            vWall[i][j] = ' ';
-    }
-    for (i = 0; i < height; ++i) {
-        cell[i] = (char*)malloc(sizeof(char)*(width));
-        cellCount[i] = (int*)malloc(sizeof(int)*width);
+        cell[i] = (char*)malloc(sizeof(char) * (width));
+        cellCount[i] = (int*)malloc(sizeof(int) * width);
         for (j = 0; j < width; ++j) {
             cellCount[i][j] = 0;
             cell[i][j] = ' ';
         }
     }
-    for (i = 0; i < height+1; ++i) {
-        hWall[i] = (char*)malloc(sizeof(char)*(width));
-        for (j = 0; j < width; ++j)
-            hWall[i][j] = ' ';
-    }
-    for (i = 0; i < height+1; ++i) {
-        block[i] = (char*)malloc(sizeof(char)*(width+1));
-        for (j = 0; j < width+1; ++j)
-            block[i][j] = '+';
-    }
     if (argc == 5) {
         int status = readFromFile(argv[4]);
-        if (status != 0)
+        if (status != 0) {
             return status;
+        }
     }
     printMap();
     return 0;
 }
 
+/*ininit a pointer char***/
+char** initPointer(int width, int height, char type) {
+    int row, col;
+    char** pointer = (char**)malloc(sizeof(char*) * height);
+    for (row = 0; row < height; ++row) {
+        pointer[row] = (char*)malloc(sizeof(char) * width);
+        for (col = 0; col < width; ++col) {
+            pointer[row][col] = type; 
+        }
+    }
+    return pointer;
+}
 
 /*Print the map to the screen
  */
 void printMap() {
     int i, j;
-    for (i = 0; i < height * 2 + 1 ; i++) {
+    for (i = 0; i < height * 2 + 1; i++) {
         if (i % 2 == 0) {
             for (j = 0; j < width * 2 + 1; j++) {
-                if (j % 2 == 0)
-                    printf("%c",block[i/2][j/2]);
-                else
-                    printf("%c",hWall[i/2][j/2]);
+                if (j % 2 == 0) {
+                    printf("%c", block[i / 2][j / 2]);
+                } else {
+                    printf("%c", hWall[i / 2][j / 2]);
+                }
             }
             printf("\n");
         } else {
             for (j = 0; j < width * 2 + 1; j++) {
-                if (j % 2 == 0)
-                    printf("%c",vWall[i/2][j/2]);
-                else
-                    printf("%c", cell[i/2][j/2]);
+                if (j % 2 == 0) {
+                    printf("%c", vWall[i / 2][j / 2]);
+                } else {
+                    printf("%c", cell[i / 2][j / 2]);
+                }
             }
             printf("\n");
         }
@@ -244,7 +245,7 @@ int getCommand(int *x, int *y, char *type) {
     if (*type == 'a') {
         return 3;
     }
-    if (checkCommand (*x, *y, *type) == 0) {
+    if (checkCommand(*x, *y, *type) == 0) {
         return 0;
     }
     return 1;
@@ -259,7 +260,7 @@ int getNumber(int order) {
     while((temp = getchar()) != ' ') {
         if (temp >= '0' && temp <= '9') {
             result *= 10;
-            result += temp-'0';
+            result += temp - '0';
             index++;
         } else {
             if (order == 0 && index == 0 && temp == 'w') {
@@ -272,9 +273,9 @@ int getNumber(int order) {
                 return -3;
             }
 
-			/*if the input includig some error character such as 'a', the function
-			 *while return -1 as a sambol
-			 */
+	/*if the input includig some error character such as 'a', the function
+	 *while return -1 as a sambol
+	 */
             if (temp != '\n') {
                 clear();
             }
@@ -314,16 +315,19 @@ int checkCommand(int x, int y, char type) {
         return 0;
     }
     if (type == 'h') {
-        if (x >= width)
+        if (x >= width) {
             return 0;
-        if (hWall[y][x] == '-')
+        }
+        if (hWall[y][x] == '-') {
             return 0;
+        }
     } else {
         if (y >= height) {
             return 0;
         }
-        if (vWall[y][x] == '|')
+        if (vWall[y][x] == '|') {
             return 0;
+        }
     }
     return 1;
 }
@@ -350,10 +354,10 @@ int playGame() {
         status = getCommand(&x, &y, &type);
         if (status == 1) {
             addBlock(x, y, type);
-            currentUser = (currentUser+ updateCell(x, y, type)) % playNumber;
+            currentUser = (currentUser + updateCell(x, y, type)) % playNumber;
             printMap();
 			/*printf("\n");*/
-            if (finishedCell == width*height) {
+            if (finishedCell == width * height) {
                 int max = 0;
                 int lastOne = 0;
                 for (i = 0; i < playNumber; ++i) {
@@ -363,14 +367,15 @@ int playGame() {
                     }
                 }
 				/*printf("\n");*/
-                printf ("Winner(s):");
-                for (i = 0; i <= lastOne ; ++i) {
+                printf("Winner(s):");
+                for (i = 0; i <= lastOne; ++i) {
                     if (winCells[i] == max) {
                         printf(" %c", users[i]);
-                        if (i < lastOne)
+                        if (i < lastOne) {
                             printf(",");
-                        else
+                        } else {
                             printf("\n");
+                        }
                     }
                 }
                 break;
@@ -386,28 +391,28 @@ int playGame() {
  */
 void clear() {
     char temp;
-    while ((temp = getchar())!= '\n');
+    while ((temp = getchar()) != '\n') {
+    }
 }
 
 /*update the cell count
  */
 int updateCell(int x, int y, char type) {
-
     int result = 1;
 
     if (type == 'h') {
         if (y - 1 >= 0) {
-            cellCount[y-1][x]++;
-            if (cellCount[y-1][x] == 4 && cellCount[y-1][x] != ' ') {
+            cellCount[y - 1][x]++;
+            if (cellCount[y - 1][x] == 4 && cellCount[y - 1][x] != ' ') {
                 result = 0;
-                cell[y-1][x] = users[currentUser];
+                cell[y - 1][x] = users[currentUser];
                 finishedCell++;
                 winCells[currentUser]++;
             }
         }
         if (y < height) {
             cellCount[y][x]++;
-            if (cellCount[y][x] == 4 && cellCount[y][x] != ' ' ) {
+            if (cellCount[y][x] == 4 && cellCount[y][x] != ' ') {
                 result = 0;
                 cell[y][x] = users[currentUser];
                 finishedCell++;
@@ -425,11 +430,11 @@ int updateCell(int x, int y, char type) {
             }
         }
         if (x - 1 >= 0) {
-            cellCount[y][x-1]++;
-            if (cellCount[y][x-1] == 4 && cellCount[y][x] != ' ') {
+            cellCount[y][x - 1]++;
+            if (cellCount[y][x - 1] == 4 && cellCount[y][x] != ' ') {
                 result = 0;
                 finishedCell++;
-                cell[y][x-1] = users[currentUser];
+                cell[y][x - 1] = users[currentUser];
                 winCells[currentUser]++;
             }
         }
@@ -456,12 +461,14 @@ int readFromFile(char* path) {
     }
 
     status = setBlocks(inputFile);
-    if (status == 5)
+    if (status == 5) {
         return 5;
+    }
 
     status = setCells(inputFile);
-    if (status == 5)
+    if (status == 5) {
         return 5;
+    }
 	
 
     fclose(inputFile);
@@ -473,7 +480,7 @@ int readFromFile(char* path) {
 int getCurrentUser(FILE* file) {
     int result = 0;
     char temp = '0';
-    while ((temp = fgetc(file)) != '\n'&& temp != EOF) {
+    while ((temp = fgetc(file)) != '\n' && temp != EOF) {
         if (temp >= '0' && temp <= '9') {
             result *= 10;
             result += temp - '0';
@@ -481,10 +488,11 @@ int getCurrentUser(FILE* file) {
             return -1;
         }
     }
-    if (result <= playNumber && result >= 1)
-        return result-1;
-    else
+    if (result <= playNumber && result >= 1) {
+        return result - 1;
+    } else {
         return -2;
+    }
 }
 
 /*
@@ -493,10 +501,12 @@ int getCurrentUser(FILE* file) {
 int setBlocks(FILE* file) {
     int i;
     for (i = 0; i < height; ++i) {
-        if (setRow(file, hWall, i, width, '-') == 5)
+        if (setRow(file, hWall, i, width, '-') == 5) {
             return 5;
-        if (setRow(file, vWall, i, width+1, '|') == 5)
+        }
+        if (setRow(file, vWall, i, width + 1, '|') == 5) {
             return 5;
+        }
     }
     return setRow(file, hWall, i, width, '-');
 }
@@ -507,8 +517,9 @@ int setRow(FILE*file, char**blocks, int row, int col, char type) {
     int i;
     for (i = 0; i < col; ++i) {
         temp = fgetc(file);
-        if (temp != '0' && temp != '1')
+        if (temp != '0' && temp != '1') {
             return 5;
+        }
         if (temp == '1') {
             blocks[row][i] = type;
             if (type == '-') {
@@ -519,10 +530,11 @@ int setRow(FILE*file, char**blocks, int row, int col, char type) {
         }
     }
     temp = fgetc(file);
-    if (temp == '\n')
+    if (temp == '\n') {
         return 0;
-    else
+    } else {
         return 5;
+    }
 }
 
 /*
@@ -533,27 +545,31 @@ int setCells(FILE* file) {
     char temp;
 
     int i;
-    for (i = 0; i < playNumber; ++i)
+    for (i = 0; i < playNumber; ++i) {
         winCells[i] = 0;
+    }
 
     for (row = 0; row < height; ++row) {
         for (col = 0; col < width; ++col) {
             int owner = 0;
-            while ((temp = fgetc(file)) != ',' && temp != '\n' && temp != EOF) {
+            while ((temp = fgetc(file)) != ','
+                    && temp != '\n' && temp != EOF) {
                 if (temp >= '0' && temp <= '9') {
                     owner *= 10;
-                    owner += temp-'0';
+                    owner += temp - '0';
                 } else {
                     return 5;
                 }
             }
-            if (owner > playNumber)
+            if (owner > playNumber) {
                 return 5;
-            if (temp != ',' && temp < width-1)
+            }
+            if (temp != ',' && temp < width - 1) {
                 return 5;
+            }
             if (cellCount[row][col] == 4 && owner > 0) {
-                cell[row][col] = users[owner-1];
-                winCells[owner-1]++;
+                cell[row][col] = users[owner - 1];
+                winCells[owner - 1]++;
             } else if (cellCount[row][col] == 4 && owner == 0) {
                 return 5;
             } else if (cellCount[row][col] < 4 && owner > 0) {
@@ -590,16 +606,16 @@ int store() {
         }
         length++;
     }
-    path = malloc(sizeof(char)*(length+1));
+    path = malloc(sizeof(char) * (length + 1));
     next = start;
     while (next != NULL) {
         path[index] = next->context;
         index++;
-        next = next -> next;
+        next = next->next;
     }
     path[index] = '\0';
     while (next != NULL) {
-        next = start -> next;
+        next = start->next;
         free(start);
         start = next;
     }
@@ -619,10 +635,10 @@ int store() {
 /*store the information in to FILE* file*/
 void storeInFile(FILE* file) {
     int row;
-    fprintf(file, "%d\n", currentUser+1);
+    fprintf(file, "%d\n", currentUser + 1);
     for (row = 0; row < height; ++row) {
         outputRow(file, hWall, row, width);
-        outputRow(file, vWall, row, width+1);
+        outputRow(file, vWall, row, width + 1);
     }
     outputRow(file, hWall, row, width);
     printCells(file);
@@ -632,19 +648,19 @@ void storeInFile(FILE* file) {
 void outputRow(FILE* file, char** walls, int row, int max) {
     int col;
     for (col = 0; col < max; ++col) {
-        if (walls[row][col] == ' ')
+        if (walls[row][col] == ' ') {
             fprintf(file, "0");
-
-        else
+        } else {
             fprintf(file, "1");
-	}
+        }
+    }
     fprintf(file, "\n");
 }
 
 /*store the cells into the file*/
 void printCells(FILE* file) {
     int i;
-    for (i = 0; i < height-1; ++i) {
+    for (i = 0; i < height - 1; ++i) {
         printCellRow(file, i);
         fprintf(file, "\n");
     }
@@ -654,14 +670,16 @@ void printCells(FILE* file) {
 /*store a line of cell row into the file*/
 void printCellRow(FILE* file, int row) {
     int col;
-    for (col = 0; col < width-1; ++col) {
-        if (cell[row][col] == ' ')
+    for (col = 0; col < width - 1; ++col) {
+        if (cell[row][col] == ' ') {
             fprintf(file, "%d,", 0);
-        else
-            fprintf(file, "%d,", cell[row][col]-'A'+1);
+        } else {
+            fprintf(file, "%d,", cell[row][col] - 'A' + 1);
+        }
     }
-    if (cell[row][col] == ' ')
+    if (cell[row][col] == ' ') {
         fprintf(file, "%d", 0);
-    else
-        fprintf(file, "%d", cell[row][col]-'A'+1);
+    } else {
+        fprintf(file, "%d", cell[row][col] - 'A' + 1);
+    }
 }
