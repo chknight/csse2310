@@ -21,35 +21,35 @@ int width; /*width is the input of the width*/
 int playNumber; /*playNumber is the number of the player*/
 int currentUser; /*used to store the user played now*/
 int finishedCell; /*used to store how many cells is occupyed*/
-int readNumberFromString(char* string); 
-int changeStringToNumber(const char* string);
+int read_number_from_string(char* string); 
+int change_string_to_number(const char* string);
 int initialize(char**, int);
-char** initPointer(int width, int height, char type);
-void printMap();
-int getNumber();
-char getType();
+char** init_pointer(int width, int height, char type);
+void print_map();
+int get_number();
+char get_type();
 int getX();
 int getY();
-int checkCommand(int, int, char);
-int playGame();
-int getCommand(int*, int*, char*);
-void addBlock(int, int, char);
+int check_command(int, int, char);
+int play_game();
+int get_command(int*, int*, char*);
+void add_block(int, int, char);
 void clear();
-int updateCell(int, int, char);
-int readFromFile(char*);
-int getCurrentUser(FILE*);
-int setBlocks(FILE*);
-int setCells(FILE*);
-int setRow(FILE*, char**, int, int, char);
+int update_cell(int, int, char);
+int read_from_file(char*);
+int get_current_user(FILE*);
+int set_blocks(FILE*);
+int set_cells(FILE*);
+int set_row(FILE*, char**, int, int, char);
 int store();
-void storeInFile(FILE*);
-void outputRow(FILE*, char**, int, int);
-void printCells(FILE* file);
-void printCellRow(FILE*, int);
+void stroe_in_file(FILE*);
+void output_row(FILE*, char**, int, int);
+void print_cells(FILE* file);
+void print_cell_row(FILE*, int);
 
-struct list {
+struct List {
     char context;
-    struct list* next;
+    struct List* next;
 };
 
 
@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Error reading grid contents\n");
         return status;
     }
-    status = playGame();
+    status = play_game();
     if (status == 6) {
         fprintf(stderr, "End of user input\n");
     }
@@ -82,7 +82,7 @@ int main(int argc, char** argv) {
 
 /*To get a number from the string
 */
-int readNumberFromString(char* string) {
+int read_number_from_string(char* string) {
     int result = 0;
     while(*string != ' ' && *string != '\n') {
         if (*string >= '0' && *string <= '9') {
@@ -100,7 +100,7 @@ int readNumberFromString(char* string) {
 
 /*To change a string to a number
  */
-int changeStringToNumber(const char* string) {
+int change_string_to_number(const char* string) {
     int index = 0;
     int result = 0;
     if (string == NULL) {
@@ -120,7 +120,7 @@ int changeStringToNumber(const char* string) {
 
 /*check the initialize input in command line whether satisfy the require ment
  */
-int checkTheCommandInput() {
+int check_the_command_input() {
     if (height == -1 || width == -1) {
         return 2;
     } else if (height > 999 || height <= 1) {
@@ -139,13 +139,13 @@ int checkTheCommandInput() {
 int initialize(char** argv, int argc) {
     int i;
     int j;
-    height = changeStringToNumber(argv[1]);
-    width = changeStringToNumber(argv[2]);
-    playNumber = changeStringToNumber(argv[3]);
+    height = change_string_to_number(argv[1]);
+    width = change_string_to_number(argv[2]);
+    playNumber = change_string_to_number(argv[3]);
 
-    if (checkTheCommandInput() == 2) {
+    if (check_the_command_input() == 2) {
         return 2;
-    } else if (checkTheCommandInput() == 3) {
+    } else if (check_the_command_input() == 3) {
         return 3;
     }
     currentUser = 0;
@@ -156,9 +156,9 @@ int initialize(char** argv, int argc) {
         winCells[i] = 0;
     }
     finishedCell = 0;
-    hWall = initPointer(width, height + 1, ' ');
-    vWall = initPointer(width + 1, height, ' ');
-    block = initPointer(width + 1, height + 1, '+');
+    hWall = init_pointer(width, height + 1, ' ');
+    vWall = init_pointer(width + 1, height, ' ');
+    block = init_pointer(width + 1, height + 1, '+');
     cell = (char**)malloc(sizeof(char*) * height);
     cellCount = (int**)malloc(sizeof(int*) * height);
     for (i = 0; i < height; ++i) {
@@ -170,17 +170,17 @@ int initialize(char** argv, int argc) {
         }
     }
     if (argc == 5) {
-        int status = readFromFile(argv[4]);
+        int status = read_from_file(argv[4]);
         if (status != 0) {
             return status;
         }
     }
-    printMap();
+    print_map();
     return 0;
 }
 
 /*ininit a pointer char***/
-char** initPointer(int width, int height, char type) {
+char** init_pointer(int width, int height, char type) {
     int row, col;
     char** pointer = (char**)malloc(sizeof(char*) * height);
     for (row = 0; row < height; ++row) {
@@ -194,7 +194,7 @@ char** initPointer(int width, int height, char type) {
 
 /*Print the map to the screen
  */
-void printMap() {
+void print_map() {
     int i, j;
     for (i = 0; i < height * 2 + 1; i++) {
         if (i % 2 == 0) {
@@ -221,9 +221,9 @@ void printMap() {
 
 /*receive the command given by the user
  */
-int getCommand(int *x, int *y, char *type) {
+int get_command(int *x, int *y, char *type) {
 
-    *y = getNumber(0);
+    *y = get_number(0);
     if (*y == -1) {
         return 0;
     }
@@ -232,20 +232,20 @@ int getCommand(int *x, int *y, char *type) {
     } else if (*y == -3) {
         return 3;
     }
-    *x = getNumber(1);
+    *x = get_number(1);
     if (*x == -1) {
         return 0;
     } else if (*y == -3) {
         return 3;
     }
-    *type = getType();
+    *type = get_type();
     if (*type == '\0') {
         return 0;
     }
     if (*type == 'a') {
         return 3;
     }
-    if (checkCommand(*x, *y, *type) == 0) {
+    if (check_command(*x, *y, *type) == 0) {
         return 0;
     }
     return 1;
@@ -253,7 +253,7 @@ int getCommand(int *x, int *y, char *type) {
 
 /*get a number from the input
  */
-int getNumber(int order) {
+int get_number(int order) {
     char temp;
     int result = 0;
     int index = 0;
@@ -287,7 +287,7 @@ int getNumber(int order) {
 
 /*get the type of operation of the user
  */
-char getType() {
+char get_type() {
     char type = getchar();
     char symbol = getchar();
     if (symbol != '\n') {
@@ -307,7 +307,7 @@ char getType() {
 
 /*check whether the command is correct
  */
-int checkCommand(int x, int y, char type) {
+int check_command(int x, int y, char type) {
     if (type == '\0') {
         return 0;
     }
@@ -334,7 +334,7 @@ int checkCommand(int x, int y, char type) {
 
 /*add a block in the map
  */
-void addBlock(int x, int y, char type) {
+void add_block(int x, int y, char type) {
     if (type == 'h') {
         hWall[y][x] = '-';
     } else {
@@ -344,18 +344,18 @@ void addBlock(int x, int y, char type) {
 
 /*the loop is used to play the game
  */
-int playGame() {
+int play_game() {
     int x, y;
     char type;
     int i;
     int status = 0;
     while (1) {
         printf("%c> ", users[currentUser]);
-        status = getCommand(&x, &y, &type);
+        status = get_command(&x, &y, &type);
         if (status == 1) {
-            addBlock(x, y, type);
-            currentUser = (currentUser + updateCell(x, y, type)) % playNumber;
-            printMap();
+            add_block(x, y, type);
+            currentUser = (currentUser + update_cell(x, y, type)) % playNumber;
+            print_map();
 			/*printf("\n");*/
             if (finishedCell == width * height) {
                 int max = 0;
@@ -397,7 +397,7 @@ void clear() {
 
 /*update the cell count
  */
-int updateCell(int x, int y, char type) {
+int update_cell(int x, int y, char type) {
     int result = 1;
 
     if (type == 'h') {
@@ -445,13 +445,13 @@ int updateCell(int x, int y, char type) {
 
 /*read the information from the input file
  */
-int readFromFile(char* path) {
+int read_from_file(char* path) {
     FILE *inputFile = fopen(path, "r");
     int status = 0;
     if (inputFile == NULL) {
         return 4;
     }
-    currentUser = getCurrentUser(inputFile);
+    currentUser = get_current_user(inputFile);
     if (currentUser == -1) {
         fclose(inputFile);
         return 5;
@@ -460,12 +460,12 @@ int readFromFile(char* path) {
         return 5;
     }
 
-    status = setBlocks(inputFile);
+    status = set_blocks(inputFile);
     if (status == 5) {
         return 5;
     }
 
-    status = setCells(inputFile);
+    status = set_cells(inputFile);
     if (status == 5) {
         return 5;
     }
@@ -477,7 +477,7 @@ int readFromFile(char* path) {
 
 /*get current user in the file
  */
-int getCurrentUser(FILE* file) {
+int get_current_user(FILE* file) {
     int result = 0;
     char temp = '0';
     while ((temp = fgetc(file)) != '\n' && temp != EOF) {
@@ -498,21 +498,21 @@ int getCurrentUser(FILE* file) {
 /*
  * set block in the file
  */
-int setBlocks(FILE* file) {
+int set_blocks(FILE* file) {
     int i;
     for (i = 0; i < height; ++i) {
-        if (setRow(file, hWall, i, width, '-') == 5) {
+        if (set_row(file, hWall, i, width, '-') == 5) {
             return 5;
         }
-        if (setRow(file, vWall, i, width + 1, '|') == 5) {
+        if (set_row(file, vWall, i, width + 1, '|') == 5) {
             return 5;
         }
     }
-    return setRow(file, hWall, i, width, '-');
+    return set_row(file, hWall, i, width, '-');
 }
 
 /*set the block of every row*/
-int setRow(FILE*file, char**blocks, int row, int col, char type) {
+int set_row(FILE*file, char**blocks, int row, int col, char type) {
     char temp = 'a';
     int i;
     for (i = 0; i < col; ++i) {
@@ -523,9 +523,9 @@ int setRow(FILE*file, char**blocks, int row, int col, char type) {
         if (temp == '1') {
             blocks[row][i] = type;
             if (type == '-') {
-                updateCell(i, row, 'h');
+                update_cell(i, row, 'h');
             } else {
-                updateCell(i, row, 'v');
+                update_cell(i, row, 'v');
             }
         }
     }
@@ -540,7 +540,7 @@ int setRow(FILE*file, char**blocks, int row, int col, char type) {
 /*
  * set the cells in the map
  */
-int setCells(FILE* file) {
+int set_cells(FILE* file) {
     int row, col;
     char temp;
 
@@ -584,8 +584,8 @@ int setCells(FILE* file) {
 int store() {
     char temp = getchar();
     char* path = NULL;
-    struct list* next = NULL;
-    struct list* start = NULL;
+    struct List* next = NULL;
+    struct List* start = NULL;
     int length = 0;
     int index = 0;
     FILE* output = NULL;
@@ -595,11 +595,11 @@ int store() {
     }
     while ((temp = getchar()) != '\n') {
         if (next == NULL) {
-            next = (struct list*)malloc(sizeof(struct list));
+            next = (struct List*)malloc(sizeof(struct List));
             start = next;
             next->context = temp;
         } else {
-            next->next = (struct list*)malloc(sizeof(struct list));
+            next->next = (struct List*)malloc(sizeof(struct List));
             next = next->next;
             next->context = temp;
             next->next = NULL;
@@ -624,7 +624,7 @@ int store() {
         fprintf(stderr, "Can not open file for write\n");
         return -2;
     } else {
-        storeInFile(output);
+        stroe_in_file(output);
         fflush(output);
         fprintf(stderr, "Save complete\n");
         fclose(output);
@@ -633,19 +633,19 @@ int store() {
 }
 
 /*store the information in to FILE* file*/
-void storeInFile(FILE* file) {
+void stroe_in_file(FILE* file) {
     int row;
     fprintf(file, "%d\n", currentUser + 1);
     for (row = 0; row < height; ++row) {
-        outputRow(file, hWall, row, width);
-        outputRow(file, vWall, row, width + 1);
+        output_row(file, hWall, row, width);
+        output_row(file, vWall, row, width + 1);
     }
-    outputRow(file, hWall, row, width);
-    printCells(file);
+    output_row(file, hWall, row, width);
+    print_cells(file);
 }
 
 /*store a row of wall into the file*/
-void outputRow(FILE* file, char** walls, int row, int max) {
+void output_row(FILE* file, char** walls, int row, int max) {
     int col;
     for (col = 0; col < max; ++col) {
         if (walls[row][col] == ' ') {
@@ -658,17 +658,16 @@ void outputRow(FILE* file, char** walls, int row, int max) {
 }
 
 /*store the cells into the file*/
-void printCells(FILE* file) {
+void print_cells(FILE* file) {
     int i;
-    for (i = 0; i < height - 1; ++i) {
-        printCellRow(file, i);
+    for (i = 0; i < height; ++i) {
+        print_cell_row(file, i);
         fprintf(file, "\n");
     }
-    printCellRow(file, i);
 }
 
 /*store a line of cell row into the file*/
-void printCellRow(FILE* file, int row) {
+void print_cell_row(FILE* file, int row) {
     int col;
     for (col = 0; col < width - 1; ++col) {
         if (cell[row][col] == ' ') {
